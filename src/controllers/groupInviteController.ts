@@ -1,0 +1,114 @@
+import { Request, Response, NextFunction } from "express";
+import asyncHandler from "express-async-handler";
+import { User } from "../entity/User";
+import { GroupInvite } from "../entity/GroupInvite";
+import { Group } from "../entity/Group";
+import { AppDataSource } from "../config/data-source";
+
+const Groups = AppDataSource.getRepository(Group);
+const Users = AppDataSource.getRepository(User);
+
+// Group Invite Routes
+
+export const inviteMember = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    const user = req.user as User;
+    const reciever = await Users.createQueryBuilder("user")
+      .where("user.id = :id", { id: req.body.id })
+      .getOne();
+    if (!reciever) {
+      return res.status(400).json({ error: "User does not exist" });
+    } else if (reciever.groupId) {
+      return res.status(400).json({ error: "User already is in a group" });
+    }
+    const group = await Groups.createQueryBuilder("group")
+      .leftJoinAndSelect("group.members", "members")
+      .where("group.id = :id", { id: user.groupId })
+      .getOne();
+    const groupInvite = new GroupInvite();
+    groupInvite.group = group!;
+    groupInvite.receiver = reciever;
+    groupInvite.sender = user;
+    await groupInvite.save();
+
+    return res.status(200).json({ success: true });
+  }
+);
+
+export const acceptInvite = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    const user = req.user as User;
+    const groupInvite = await GroupInvite.createQueryBuilder("groupInvite")
+      .leftJoinAndSelect("groupInvite.group", "group")
+      .where("groupInvite.id = :id", { id: req.body.id })
+      .getOne();
+    if (!groupInvite) {
+      return res.status(400).json({ error: "Invite does not exist" });
+    } else if (groupInvite.receiverId !== user.id) {
+      return res.status(400).json({ error: "Invite is not for you" });
+    }
+    user.group = groupInvite.group;
+    await user.save();
+    await groupInvite.remove();
+    return res.status(200).json({ success: true });
+  }
+);
+
+export const declineInvite = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    const user = req.user as User;
+    const groupInvite = await GroupInvite.createQueryBuilder("groupInvite")
+      .leftJoinAndSelect("groupInvite.group", "group")
+      .where("groupInvite.id = :id", { id: req.body.id })
+      .getOne();
+    if (!groupInvite) {
+      return res.status(400).json({ error: "Invite does not exist" });
+    } else if (groupInvite.receiverId !== user.id) {
+      return res.status(400).json({ error: "Invite is not for you" });
+    }
+    await groupInvite.remove();
+    return res.status(200).json({ success: true });
+  }
+);
+
+export const cancelInvite = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    const user = req.user as User;
+    const groupInvite = await GroupInvite.createQueryBuilder("groupInvite")
+      .leftJoinAndSelect("groupInvite.group", "group")
+      .where("groupInvite.id = :id", { id: req.body.id })
+      .getOne();
+    if (!groupInvite) {
+      return res.status(400).json({ error: "Invite does not exist" });
+    } else if (groupInvite.senderId !== user.id) {
+      return res.status(400).json({ error: "Invite is not yours" });
+    }
+    await groupInvite.remove();
+    return res.status(200).json({ success: true });
+  }
+);
+
+export const getRecievedInvites = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    const user = req.user as User;
+    const groupInvites = await GroupInvite.createQueryBuilder("groupInvite")
+      .leftJoinAndSelect("groupInvite.group", "group")
+      .leftJoinAndSelect("groupInvite.sender", "sender")
+      .select(["groupInvite.id", "group.name", "sender.username"])
+      .where("groupInvite.receiverId = :id", { id: user.id })
+      .getMany();
+    return res.status(200).json({ success: true, groupInvites: groupInvites });
+  }
+);
+
+export const getSentInvites = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    const user = req.user as User;
+    const groupInvites = await GroupInvite.createQueryBuilder("groupInvite")
+      .leftJoinAndSelect("groupInvite.receiver", "receiver")
+      .select(["groupInvite.id", "receiver.username"])
+      .where("groupInvite.senderId = :id", { id: user.id })
+      .getMany();
+    return res.status(200).json({ success: true, groupInvites: groupInvites });
+  }
+);
