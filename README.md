@@ -1,7 +1,5 @@
-# Awesome Project Build with TypeORM
+# Mix for Spotify
 
-Steps to run this project:
+Mix for Spotify is an app that allows users to create a Spotify queue with their friends. Ideal for playing music together on a car ride or at an event.
 
-1. Run `npm i` command
-2. Setup database settings inside `data-source.ts` file
-3. Run `npm start` command
+Currently in development. This is the REST API backend for the app.
