@@ -1,5 +1,9 @@
 import express, { Request, Response, NextFunction } from "express";
-import { getAccessToken, spotifyAuth } from "../controllers/spotifyAuth";
+import {
+  getAccessToken,
+  spotifyAuth,
+  getPremiumStatus,
+} from "../controllers/spotifyAuth";
 import passport from "passport";
 import { verifyMember, verifyToken } from "../config/passport";
 import {
@@ -7,6 +11,7 @@ import {
   removeSong,
   searchSpotify,
 } from "../controllers/spotifyController";
+import { get } from "http";
 
 verifyToken(passport);
 verifyMember(passport);
@@ -22,6 +27,16 @@ router.post(
   "/login",
   passport.authenticate("jwt", { session: false }),
   spotifyAuth
+);
+
+/* GET status
+  Get the premium status of the logged in user
+*/
+router.get(
+  "/status",
+  passport.authenticate("member", { session: false }),
+  getAccessToken,
+  getPremiumStatus
 );
 
 /* POST addSong

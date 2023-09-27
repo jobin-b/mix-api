@@ -53,6 +53,18 @@ export const spotifyAuth = asyncHandler(
   }
 );
 
+export const getPremiumStatus = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    const accessToken = req.accessToken as string;
+    const response = await isPremium(accessToken);
+    if (response.success) {
+      return res.status(200).json(response);
+    } else {
+      return res.status(404).json(response);
+    }
+  }
+);
+
 const isPremium = async (accessToken: string): Promise<requestResponse> => {
   const res = await axiosInstance.get("v1/me", {
     headers: {
