@@ -2,8 +2,8 @@ import express, { Request, Response, NextFunction } from "express";
 import passport from "passport";
 import { verifyHost, verifyToken } from "../config/passport";
 import {
-  createGroup,
-  endGroup,
+  createGroups,
+  endGroups,
   removeMember,
 } from "../controllers/groupController";
 import { getAccessToken } from "../controllers/spotifyAuth";
@@ -14,16 +14,16 @@ verifyHost(passport);
 
 const router = express.Router();
 
-/* Post createGroup
+/* Post createGroups
   Create a group and playlist for the host
 
   req body: { name: string, public: boolean }
 */
 router.post(
-  "/createGroup",
+  "/createGroups",
   passport.authenticate("jwt", { session: false }),
   getAccessToken,
-  createGroup
+  createGroups
 );
 
 router.put(
@@ -39,9 +39,9 @@ router.put(
 );
 
 router.delete(
-  "/endGroup",
+  "/endGroups",
   passport.authenticate("host", { session: false }),
-  endGroup
+  endGroups
 );
 
 export default router;

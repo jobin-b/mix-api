@@ -8,11 +8,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { Group } from "./Group";
-import { User } from "./User";
+import { Groups } from "./Groups";
+import { Users } from "./Users";
 
 @Entity()
-export class GroupInvite extends BaseEntity {
+export class GroupInvites extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -24,20 +24,20 @@ export class GroupInvite extends BaseEntity {
 
   // Relations
 
-  @ManyToOne(() => Group, (group) => group.groupInvites, {
+  @ManyToOne(() => Groups, (group) => group.groupInvites, {
     onDelete: "CASCADE",
   })
-  group: Group;
+  group: Groups;
 
-  @ManyToOne(() => User, (user) => user.groupInvites, {
+  @ManyToOne(() => Users, (user) => user.groupInvites, {
     onDelete: "CASCADE",
   })
-  receiver: User;
+  receiver: Users;
 
-  @ManyToOne(() => User, (user) => user.sentGroupInvites, {
+  @ManyToOne(() => Users, (user) => user.sentGroupsInvitesRepository, {
     onDelete: "CASCADE",
   })
-  sender: User;
+  sender: Users;
 
   // Informational
 

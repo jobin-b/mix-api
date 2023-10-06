@@ -1,8 +1,8 @@
-import { User } from "../entity/User";
+import { Users } from "../entity/Users";
 
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 
-// Authenticate User using JWT Token
+// Authenticate Users using JWT Token
 export const verifyToken = (passport) => {
   const options: any = {};
   options.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
@@ -10,7 +10,7 @@ export const verifyToken = (passport) => {
   passport.use(
     new JwtStrategy(options, async (payload, done) => {
       try {
-        const user = await User.createQueryBuilder("user")
+        const user = await Users.createQueryBuilder("user")
           .where("user.id = :id", { id: payload.id })
           .getOne();
         // user found
@@ -35,7 +35,7 @@ export const verifyHost = (passport) => {
     "host",
     new JwtStrategy(options, async (payload, done) => {
       try {
-        const user = await User.createQueryBuilder("user")
+        const user = await Users.createQueryBuilder("user")
           .leftJoinAndSelect("user.group", "group")
           .where("user.id = :id", { id: payload.id })
           .getOne();
@@ -61,7 +61,7 @@ export const verifyMember = (passport) => {
     "member",
     new JwtStrategy(options, async (payload, done) => {
       try {
-        const user = await User.createQueryBuilder("user")
+        const user = await Users.createQueryBuilder("user")
           .leftJoinAndSelect("user.group", "group")
           .where("user.id = :id", { id: payload.id })
           .getOne();

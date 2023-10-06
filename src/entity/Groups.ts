@@ -7,12 +7,12 @@ import {
   OneToOne,
   JoinColumn,
 } from "typeorm";
-import { User } from "./User";
-import { GroupInvite } from "./GroupInvite";
-import { Queue } from "./Queue";
+import { Users } from "./Users";
+import { GroupInvites } from "./GroupInvites";
+import { Queues } from "./Queues";
 
 @Entity()
-export class Group extends BaseEntity {
+export class Groups extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -30,17 +30,17 @@ export class Group extends BaseEntity {
 
   // Relations
 
-  @OneToMany(() => User, (user) => user.group)
-  members: User[];
+  @OneToMany(() => Users, (user) => user.group)
+  members: Users[];
 
-  @OneToOne(() => User)
+  @OneToOne(() => Users)
   @JoinColumn()
-  host: User;
+  host: Users;
 
-  @OneToOne(() => Queue, { cascade: true })
+  @OneToOne(() => Queues, { cascade: true })
   @JoinColumn()
-  queue: Queue;
+  queue: Queues;
 
-  @OneToMany(() => GroupInvite, (groupInvite) => groupInvite.group)
-  groupInvites: GroupInvite[];
+  @OneToMany(() => GroupInvites, (groupInvite) => groupInvite.group)
+  groupInvites: GroupInvites[];
 }

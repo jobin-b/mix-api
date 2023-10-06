@@ -8,24 +8,24 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { User } from "./User";
+import { Users } from "./Users";
 
 @Entity()
-export class FriendRequest extends BaseEntity {
+export class FriendRequests extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   // Relations
 
-  @ManyToOne(() => User, (user) => user.groupInvites, {
+  @ManyToOne(() => Users, (user) => user.groupInvites, {
     onDelete: "CASCADE",
   })
-  receiver: User;
+  receiver: Users;
 
-  @ManyToOne(() => User, (user) => user.sentGroupInvites, {
+  @ManyToOne(() => Users, (user) => user.sentGroupsInvitesRepository, {
     onDelete: "CASCADE",
   })
-  sender: User;
+  sender: Users;
 
   // Informational
 

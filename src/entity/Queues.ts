@@ -1,4 +1,4 @@
-// create queue playlist entity as Queue
+// create queue playlist entity as Queues
 
 import {
   Entity,
@@ -9,10 +9,10 @@ import {
   OneToOne,
   JoinColumn,
 } from "typeorm";
-import { Group } from "./Group";
+import { Groups } from "./Groups";
 
 @Entity()
-export class Queue extends BaseEntity {
+export class Queues extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

@@ -12,8 +12,8 @@ export const createPlaylist = async (userId: string, accessToken: string) => {
   const response = await axiosInstance.post(
     `v1/users/${userId}/playlists`,
     {
-      name: "Queue App Name",
-      description: "Playlist created by Queue App",
+      name: "Queues App Name",
+      description: "Playlist created by Queues App",
       public: false,
     },
     {

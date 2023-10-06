@@ -1,12 +1,9 @@
 import express from "express";
 import passport from "passport";
 import { verifyMember } from "../config/passport";
-import {
-  createGroup,
-  inviteMember,
-  removeMember,
-} from "../controllers/groupController";
+import { createGroups, removeMember } from "../controllers/groupController";
 import { getAccessToken } from "../controllers/spotifyAuth";
+import { inviteMember } from "../controllers/groupInviteController";
 
 verifyMember(passport);
 
@@ -16,7 +13,7 @@ router.post(
   "/addSong",
   passport.authenticate("jwt", { session: false }),
   getAccessToken,
-  createGroup
+  createGroups
 );
 
 router.put(

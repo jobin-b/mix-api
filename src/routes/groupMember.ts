@@ -2,9 +2,9 @@ import express from "express";
 import passport from "passport";
 import { verifyToken, verifyHost, verifyMember } from "../config/passport";
 import {
-  getGroup,
-  joinGroup,
-  leaveGroup,
+  getGroups,
+  joinGroups,
+  leaveGroups,
 } from "../controllers/groupController";
 
 verifyToken(passport);
@@ -13,27 +13,27 @@ verifyMember(passport);
 const router = express.Router();
 
 router.post(
-  "/joinGroup",
+  "/joinGroups",
   passport.authenticate("jwt", { session: false }),
-  joinGroup
+  joinGroups
 );
 
 router.post(
-  "/leaveGroup",
+  "/leaveGroups",
   passport.authenticate("member", { session: false }),
-  leaveGroup
+  leaveGroups
 );
 
 router.get(
-  "/getGroup",
+  "/getGroups",
   passport.authenticate("member", { session: false }),
-  getGroup
+  getGroups
 );
 
 router.get(
   "/getQueue",
   passport.authenticate("member", { session: false }),
-  getGroup
+  getGroups
 );
 
 export default router;

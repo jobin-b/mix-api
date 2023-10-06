@@ -1,9 +1,9 @@
-import { User } from "../entity/User";
+import { Users } from "../entity/Users";
 import { AppDataSource } from "../config/data-source";
 import { requestResponse } from "../types";
 export const addFriendship = async (
-  user: User,
-  friend: User
+  user: Users,
+  friend: Users
 ): Promise<requestResponse> => {
   const prevFriends = addFriendshipHelper(user, friend);
   if (!prevFriends) return { error: "Friendship already exists" };
@@ -11,8 +11,8 @@ export const addFriendship = async (
 
   try {
     await AppDataSource.transaction(async (transactionalEntityManager) => {
-      await transactionalEntityManager.save(User, user);
-      await transactionalEntityManager.save(User, friend);
+      await transactionalEntityManager.save(Users, user);
+      await transactionalEntityManager.save(Users, friend);
     });
     return { success: true };
   } catch (err) {
@@ -20,7 +20,7 @@ export const addFriendship = async (
   }
 };
 
-const addFriendshipHelper = (user: User, friend: User) => {
+const addFriendshipHelper = (user: Users, friend: Users) => {
   if (!user.friends) {
     user.friends = [friend];
   } else if (!user.friends.some((u) => u.id === friend.id)) {
@@ -30,16 +30,16 @@ const addFriendshipHelper = (user: User, friend: User) => {
 };
 
 export const deleteFriendship = async (
-  user: User,
-  friend: User
+  user: Users,
+  friend: Users
 ): Promise<requestResponse> => {
   if (user.friends && friend.friends) {
     user.friends = user.friends.filter((u) => u.id !== friend.id);
     friend.friends = friend.friends.filter((u) => u.id !== user.id);
 
     await AppDataSource.transaction(async (transactionalEntityManager) => {
-      await transactionalEntityManager.save(User, user);
-      await transactionalEntityManager.save(User, friend);
+      await transactionalEntityManager.save(Users, user);
+      await transactionalEntityManager.save(Users, friend);
     });
     return { success: true };
   } else {

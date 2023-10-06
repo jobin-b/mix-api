@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import asyncHandler from "express-async-handler";
-import { User } from "../entity/User";
+import { Users } from "../entity/Users";
 import {
   addSongToPlaylist,
   removeSongFromPlaylist,
@@ -9,12 +9,12 @@ import {
 import { io } from "../config/socket";
 import { v4 as uuidv4 } from "uuid";
 import { AppDataSource } from "../config/data-source";
-import { Group } from "../entity/Group";
-import { Queue } from "../entity/Queue";
+import { Groups } from "../entity/Groups";
+import { Queues } from "../entity/Queues";
 
 // TODO: add snapshot_id to all
 
-const Queues = AppDataSource.getRepository(Queue);
+const QueuesRepository = AppDataSource.getRepository(Queues);
 // returns { songs: [spotify track items]}
 export const searchSpotify = asyncHandler(
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -31,12 +31,12 @@ export const searchSpotify = asyncHandler(
 export const addSong = asyncHandler(
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     const { songUri } = req.body;
-    const groupId = (req.user as User).groupId;
-    const queue = await Queues.createQueryBuilder("queue")
+    const groupId = (req.user as Users).groupId;
+    const queue = await QueuesRepository.createQueryBuilder("queue")
       .where("queue.groupId = :groupId", { groupId: groupId })
       .getOne();
     if (!queue) {
-      return res.status(404).json({ error: "Group not found" });
+      return res.status(404).json({ error: "Groups not found" });
     }
     const playlistId = queue.playlistId;
     const accessToken = req.accessToken as string;
@@ -53,12 +53,12 @@ export const addSong = asyncHandler(
 export const removeSong = asyncHandler(
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     const { songUri, id } = req.body;
-    const groupId = (req.user as User).groupId;
-    const queue = await Queues.createQueryBuilder("queue")
+    const groupId = (req.user as Users).groupId;
+    const queue = await QueuesRepository.createQueryBuilder("queue")
       .where("queue.groupId = :groupId", { groupId: groupId })
       .getOne();
     if (!queue) {
-      return res.status(404).json({ error: "Group not found" });
+      return res.status(404).json({ error: "Groups not found" });
     }
     const playlistId = queue.playlistId;
     const accessToken = req.accessToken as string;
@@ -79,12 +79,12 @@ export const removeSong = asyncHandler(
 export const reorderQueue = asyncHandler(
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     const { rangeStart, insertBefore } = req.body;
-    const groupId = (req.user as User).groupId;
-    const queue = await Queues.createQueryBuilder("queue")
+    const groupId = (req.user as Users).groupId;
+    const queue = await QueuesRepository.createQueryBuilder("queue")
       .where("queue.groupId = :groupId", { groupId: groupId })
       .getOne();
     if (!queue) {
-      return res.status(404).json({ error: "Group not found" });
+      return res.status(404).json({ error: "Groups not found" });
     }
     const playlistId = queue.playlistId;
     const accessToken = req.accessToken as string;

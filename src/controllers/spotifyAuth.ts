@@ -1,13 +1,13 @@
 import express, { Request, Response, NextFunction } from "express";
 import asyncHandler from "express-async-handler";
 import axiosInstance from "../config/axios";
-import { User } from "../entity/User";
+import { Users } from "../entity/Users";
 import { redis } from "../config/redis";
 import { requestResponse } from "../types";
 
 export const spotifyAuth = asyncHandler(
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-    const user = req.user as User;
+    const user = req.user as Users;
     const { codeVerifier, code } = req.body;
     let body = new URLSearchParams({
       grant_type: "authorization_code",
@@ -36,20 +36,20 @@ export const spotifyAuth = asyncHandler(
         // refresh token in user DB doc
         user.refreshToken = refreshToken;
 
-        // get user's spotify User Id
-        const spotifyUser = await axiosInstance.get("v1/me", {
+        // get user's spotify Users Id
+        const spotifyUsers = await axiosInstance.get("v1/me", {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        user.spotifyId = spotifyUser.data.id;
+        user.spotifyId = spotifyUsers.data.id;
 
         await user.save();
 
         return res.status(200).json(response);
       }
     }
-    return res.status(404).json({ error: "User not found" });
+    return res.status(404).json({ error: "Users not found" });
   }
 );
 
@@ -75,10 +75,10 @@ const isPremium = async (accessToken: string): Promise<requestResponse> => {
     if (res.data.product === "premium") {
       return { success: true };
     } else {
-      return { error: "User does not Have premium" };
+      return { error: "Users does not Have premium" };
     }
   } else {
-    return { error: "User not found" };
+    return { error: "Users not found" };
   }
 };
 
@@ -105,7 +105,7 @@ const refreshAccessToken = async (refreshToken: string): Promise<string> => {
 // Adds accessToken to req
 export const getAccessToken = asyncHandler(
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-    const user = req.user as User;
+    const user = req.user as Users;
     let accessToken = await redis.get("access_token:" + user.id);
     if (!accessToken) {
       accessToken = await refreshAccessToken(user.refreshToken);
